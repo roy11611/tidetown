@@ -497,17 +497,20 @@ v1 규칙을 그대로 옮긴 내용이다.
 
 ## 10. 구현할 때 주의할 점
 
-- json에서 읽은 숫자는 float일 수 있다. 정수인지 확인하고 `int`로 바꿔 담는다.
+- json에서 읽은 숫자는 정수도 float로 온다(11장). 정수인지 확인하고 `int`로 바꿔 담는다.
 - json에서 읽은 배열은 타입 없는 `Array`다. `Array[StringName]` 같은 typed array 매개변수에 바로 넘기지 말고 새 배열에 옮겨 담는다.
 - json의 문자열 id는 읽을 때 `StringName`으로 바꾸고, core 안에서는 `StringName`만 쓴다.
 - core에서는 Node, SceneTree, Input, 씬 파일을 쓰지 않는다. 파일 읽기(`FileAccess`)와 `JSON`은 써도 된다.
 - 한 함수가 40줄을 넘으면 나눈다. 데이터 검증은 필드 종류별 작은 함수로 나누면 넘지 않는다.
 
-## 11. 아직 확인하지 못한 것
+## 11. Godot 4.7에서 확인한 것
 
-이 설계는 Godot를 실행할 수 없는 환경에서 작성했다. 아래는 프로젝트 골격을 만들 때 Godot 4.7로 확인한다.
+이 설계는 Godot를 실행할 수 없는 환경에서 작성했다. 프로젝트 골격을 만들 때(2026-11-18) Godot 4.7.stable로 아래를 확인했다. 3장의 선언은 모두 그대로 파싱되어 표기를 바꾼 것이 없다.
 
-- 3장의 선언이 그대로 파싱되는지. 특히 `Array[BoardState.Cell]`처럼 다른 클래스의 enum을 원소로 하는 typed array, `Dictionary[Vector2i, int]` 반환 타입, 다른 클래스의 enum을 타입으로 적은 signal 매개변수.
-- `JSON` 파싱 결과에서 정수가 어떤 타입으로 오는지.
-
-파싱되지 않는 선언이 있으면 뜻을 유지한 채 표기만 바꾸고, 바꾼 내용을 이 문서에 반영한다.
+| 확인한 것 | 결과 |
+| --- | --- |
+| 3장의 선언 전체 | `--check-only`와 `--import`에서 오류 없이 파싱되고, 7개 `class_name`이 모두 등록된다 |
+| 다른 클래스의 enum을 원소로 하는 typed array (`Array[BoardState.Cell]`) | 된다. 실행 중에는 원소 타입이 `int`인 typed array다 |
+| `Dictionary[Vector2i, int]` 반환 타입 | 된다. `return {}`도 키가 `Vector2i`, 값이 `int`인 typed dictionary가 된다 |
+| 다른 클래스의 enum을 타입으로 적은 signal 매개변수 (`new_phase: Tide.Phase`) | 된다. 매개변수 정보에는 타입 `int`, 클래스 이름 `Tide.Phase`로 나온다 |
+| `JSON` 파싱 결과의 정수 | 정수도 모두 `float`로 온다(`1` → `1.0`). 배열은 타입 없는 `Array`로 온다 |
