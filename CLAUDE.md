@@ -101,6 +101,9 @@ docs/
 Godot 실행 파일 이름은 환경마다 다르다. 아래 `godot`은 본인 PC의 Godot 4.7 실행 파일 경로로 바꿔 쓴다.
 
 ```bash
+# class_name 등록. 처음 clone한 뒤, 그리고 class_name을 새로 만들거나 바꾼 뒤 테스트 전에 한 번
+godot --headless --import
+
 # 단위 테스트 전체 실행
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit
 
@@ -110,6 +113,8 @@ godot --headless -s tools/sim/run_sim.gd -- --games=1000 --seed=42
 # 게임 실행
 godot --path .
 ```
+
+테스트 스크립트가 파싱에 실패하면 GUT는 그 파일을 건너뛰고(`Ignoring script ...` 경고), 나머지가 통과하면 exit code 0으로 끝난다. 결과의 `Scripts`와 `Tests` 수가 예상과 같은지 확인한다.
 
 ## 8. Claude 작업 규칙
 
