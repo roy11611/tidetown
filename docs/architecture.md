@@ -69,6 +69,9 @@ func all_cells() -> Array[Vector2i]
 - `cells_within`은 거리가 1 이상 `radius` 이하인 보드 안의 칸을 돌려준다. 자기 칸은 빼고, 보드 밖은 넣지 않는다. 거리는 가로 차이와 세로 차이의 합이다. `radius`가 1이면 인접 4칸이다.
 - `all_cells`와 `cells_within`은 위에서 아래로, 같은 줄에서는 왼쪽에서 오른쪽으로 돌려준다. 순회 순서가 정해져 있어야 시뮬레이션이 재현된다.
 - 좌표는 `Vector2i(x, y)`이고 `rows[y][x]`에 대응한다.
+- `from_island`는 `GameState.validate_island`를 통과한 섬 데이터를 받는다. 형식은 다시 검사하지 않는다.
+- 보드 밖에는 건물이 없으므로 보드 밖 좌표에 `has_building`은 `false`, `get_building`은 `&""`를 돌려준다. `get_cell`은 돌려줄 지형이 없으므로 `push_error`를 내고 `LAND`를 돌려준다.
+- `place_building`은 보드 밖이거나, 이미 건물이 있거나, `tile_id`가 비어 있으면 보드를 바꾸지 않고 `push_error`를 낸다. 정상 흐름에서는 `Placement.check`가 먼저 막는다.
 
 ### 3.2 TileDefs
 
