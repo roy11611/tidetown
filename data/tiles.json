@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "tiles": [
+    { "id": "house",
+      "display": { "name": "집", "label": "집", "color": "#E0B050" },
+      "placement": { "terrain": ["LAND"] },
+      "scoring": [
+        { "on": "place", "type": "count", "match": { "tiles": ["house"] }, "radius": 1, "points": 1 },
+        { "on": "place", "type": "count", "match": { "tiles": ["market"] }, "radius": 1, "points": 2, "max_count": 1 },
+        { "on": "place", "type": "count", "match": { "terrain": ["SEA"] }, "radius": 1, "points": 1 },
+        { "on": "place", "type": "count", "match": { "tiles": ["drying_rack"] }, "radius": 1, "points": -1 }
+      ] },
+    { "id": "pier",
+      "display": { "name": "부두", "label": "부", "color": "#8D6E63" },
+      "placement": { "terrain": ["LAND"], "adjacent_terrain": ["SEA"] },
+      "scoring": [
+        { "on": "tide_high", "type": "flat", "points": 3 },
+        { "on": "tide_high", "type": "count", "match": { "tiles": ["pier"] }, "radius": 1, "points": -1 }
+      ] },
+    { "id": "market",
+      "display": { "name": "시장", "label": "시", "color": "#D9534F" },
+      "placement": { "terrain": ["LAND"] },
+      "scoring": [
+        { "on": "place", "type": "count", "match": { "tiles": ["house", "pier"] }, "radius": 1, "points": 2 }
+      ] },
+    { "id": "lighthouse",
+      "display": { "name": "등대", "label": "등", "color": "#F5F5F5" },
+      "placement": { "terrain": ["LAND"], "max_on_board": 1 },
+      "scoring": [
+        { "on": "place", "type": "count", "match": { "tiles": ["pier"] }, "radius": 2, "points": 3 }
+      ] },
+    { "id": "salt_farm",
+      "display": { "name": "염전", "label": "염", "color": "#CFD8DC" },
+      "placement": { "terrain": ["FLAT"] },
+      "scoring": [
+        { "on": "tide_low", "type": "flat", "points": 2 }
+      ] },
+    { "id": "drying_rack",
+      "display": { "name": "덕장", "label": "덕", "color": "#A1887F" },
+      "placement": { "terrain": ["LAND"] },
+      "scoring": [
+        { "on": "place", "type": "count", "match": { "tiles": ["pier"] }, "radius": 1, "points": 2 },
+        { "on": "place", "type": "count", "match": { "tiles": ["house"] }, "radius": 1, "points": -1 }
+      ] }
+  ]
+}
