@@ -109,6 +109,7 @@ func rules_for(tile_id: StringName, event: StringName) -> Array[ScoreRule]
 
 - `from_dict`와 `load_file`을 나눈 것은 테스트에서 파일 없이 정의를 만들기 위해서다.
 - 검증에 실패한 정의로는 판을 만들지 않는다(3.7).
+- `from_dict`는 데이터가 틀려도 `null`을 돌려주지 않고, 찾은 문제를 모두 `errors()`에 담는다. `load_file`도 파일이 없거나, JSON이 깨졌거나, 최상위가 객체가 아니면 그 내용을 `errors()`에 담은 빈 정의를 돌려준다. 부르는 쪽은 언제나 `errors()`만 보면 된다.
 
 ### 3.3 Tide
 
@@ -366,6 +367,14 @@ v1 규칙을 그대로 옮긴 내용이다.
 - `match`에 `tiles`와 `terrain`이 둘 다 있거나 둘 다 없음
 - 정수가 아닌 `points`, `radius`, `max_count`, `max_on_board`, 또는 1보다 작은 `radius`, `max_count`, `max_on_board`
 - 스키마에 없는 필드 이름(오타를 잡기 위해)
+- 필수 필드가 없거나 타입이 틀림(배열 자리에 문자열 등). 최상위의 `tiles`도 필수다
+- 소문자와 밑줄로 된 문자열이 아닌 `id`(숫자도 안 된다)
+- 1이 아닌 `schema_version`(없는 경우 포함)
+- `flat` 규칙에 있는 `match`, `radius`, `max_count`. 이 셋은 `count` 규칙에만 쓴다
+
+`display` 안의 필드는 검사하지 않는다. core가 해석하지 않고 view에 넘기기 때문이다. 다만 `display`가 있으면 객체여야 한다.
+
+오류는 `house.scoring[1].radius: 1 이상의 정수여야 한다 (받은 값: 0)`처럼 타일 id와 필드 경로로 적는다. id를 알 수 없거나 앞의 타일과 겹치면 `tiles[3].id`처럼 순서로 적는다. 첫 오류에서 멈추지 않고 모두 모은다.
 
 ### 5.2 `data/islands/island_01.json`
 
