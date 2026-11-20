@@ -47,7 +47,7 @@
 | 2026-11-18 | public 메서드의 한 줄 주석은 선언 바로 위에 문서 주석(`##`)으로 쓴다 | 에디터의 도움말과 자동 완성에 그대로 나온다 | 확정(11-18) |
 | 2026-11-18 | `BoardState`는 잘못된 호출에 보드를 바꾸지 않고 `push_error`로 알린다. 보드 밖·이미 건물이 있는 칸·빈 id에 놓기는 무시하고, 보드 밖의 `get_cell`은 `LAND`를 돌려준다. `from_island`는 검증을 통과한 데이터만 받으므로 다시 검사하지 않는다 | 정상 흐름에서는 `validate_island`와 `Placement.check`가 먼저 막는다. GDScript 배열은 음수 인덱스를 뒤에서부터 읽어서, 범위 검사가 없으면 틀린 지형이 오류 없이 나온다 | 확정(11-20) |
 | 2026-11-18 | GUT는 Godot 4.7용 9.7.1의 `addons/gut`만 복사해 저장소에 커밋한다 | clone만 하면 Windows에서도 바로 테스트를 돌릴 수 있다. Asset Library에는 Godot 4.6용 9.6.1만 있고, submodule은 GUT 구조상 symlink가 필요하다 | 확정 |
-| 2026-11-20 | `Tide.advance_turn`은 물때를 바꾼 다음 `phase_changed`를 보낸다. `period_turns`는 검증을 통과한 값으로 보고 다시 검사하지 않는다 | signal을 받는 쪽이 `get_phase()`로 바로 새 물때를 읽을 수 있다. 검증은 `validate_island` 한 곳에 둔다(`BoardState`와 같다) | 잠정 |
+| 2026-11-20 | `Tide.advance_turn`은 물때를 바꾼 다음 `phase_changed`를 보낸다. `period_turns`는 검증을 통과한 값으로 보고 다시 검사하지 않는다 | signal을 받는 쪽이 `get_phase()`로 바로 새 물때를 읽을 수 있다. 검증은 `validate_island` 한 곳에 둔다(`BoardState`와 같다) | 확정(11-20) |
 
 ## 제작
 
