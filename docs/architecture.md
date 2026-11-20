@@ -159,6 +159,9 @@ static func has_legal_cell(board: BoardState, defs: TileDefs, phase: Tide.Phase,
 4. `WRONG_TERRAIN`: 물때를 반영한 지형이 `terrain`에 없음
 5. `NO_ADJACENT_TERRAIN`: `adjacent_terrain`이 있는데 인접 칸 중 맞는 지형이 없음
 
+- `legal_cells`는 `BoardState.all_cells`의 순서(위에서 아래, 같은 줄에서는 왼쪽에서 오른쪽)로 돌려준다. 봇이 같은 판에서 같은 칸을 고르게 하기 위해서다.
+- `defs`에 없는 `tile_id`는 놓을 수 있는 지형이 없는 타일로 보고 `push_error`로 알린다. `check`는 위 순서대로 4번에서 `WRONG_TERRAIN`을 돌려주고, `legal_cells`는 빈 배열, `has_legal_cell`은 `false`를 돌려준다. 정상 흐름에서는 덱의 id를 `validate_island`가 먼저 검사한다.
+
 ### 3.5 Scoring
 
 점수를 계산한다. 상태가 없고 보드를 바꾸지 않는다.

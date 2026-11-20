@@ -49,6 +49,7 @@
 | 2026-11-18 | GUT는 Godot 4.7용 9.7.1의 `addons/gut`만 복사해 저장소에 커밋한다 | clone만 하면 Windows에서도 바로 테스트를 돌릴 수 있다. Asset Library에는 Godot 4.6용 9.6.1만 있고, submodule은 GUT 구조상 symlink가 필요하다 | 확정 |
 | 2026-11-20 | `Tide.advance_turn`은 물때를 바꾼 다음 `phase_changed`를 보낸다. `period_turns`는 검증을 통과한 값으로 보고 다시 검사하지 않는다 | signal을 받는 쪽이 `get_phase()`로 바로 새 물때를 읽을 수 있다. 검증은 `validate_island` 한 곳에 둔다(`BoardState`와 같다) | 확정(11-20) |
 | 2026-11-20 | `TileDefs` 검증을 문서의 목록보다 조금 넓힌다. `schema_version`은 1이어야 하고, `flat` 규칙에 `match`·`radius`·`max_count`가 있으면 오류다. `from_dict`와 `load_file`은 데이터나 파일이 틀려도 `null` 대신 오류를 담은 정의를 돌려준다 | 다른 버전의 파일이나 `flat`에 붙은 `radius`는 대개 실수인데, 조용히 무시하면 찾기 어렵다. 부르는 쪽은 `errors()` 하나만 보면 된다 | 잠정 |
+| 2026-11-20 | `Placement`는 `defs`에 없는 `tile_id`를 놓을 수 있는 지형이 없는 타일로 보고 `push_error`로 알린다(`check`는 `WRONG_TERRAIN`). `legal_cells`는 `all_cells` 순서로 돌려준다 | 이유 enum을 늘리지 않고도 정의 없는 타일이 놓이는 일을 막는다. 순서가 정해져 있어야 시뮬레이션이 재현된다 | 잠정 |
 
 ## 제작
 
