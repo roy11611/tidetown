@@ -69,6 +69,9 @@ func all_cells() -> Array[Vector2i]
 - `cells_within`은 거리가 1 이상 `radius` 이하인 보드 안의 칸을 돌려준다. 자기 칸은 빼고, 보드 밖은 넣지 않는다. 거리는 가로 차이와 세로 차이의 합이다. `radius`가 1이면 인접 4칸이다.
 - `all_cells`와 `cells_within`은 위에서 아래로, 같은 줄에서는 왼쪽에서 오른쪽으로 돌려준다. 순회 순서가 정해져 있어야 시뮬레이션이 재현된다.
 - 좌표는 `Vector2i(x, y)`이고 `rows[y][x]`에 대응한다.
+- `from_island`는 `GameState.validate_island`를 통과한 섬 데이터를 받는다. 형식은 다시 검사하지 않는다.
+- 보드 밖에는 건물이 없으므로 보드 밖 좌표에 `has_building`은 `false`, `get_building`은 `&""`를 돌려준다. `get_cell`은 돌려줄 지형이 없으므로 `push_error`를 내고 `LAND`를 돌려준다.
+- `place_building`은 보드 밖이거나, 이미 건물이 있거나, `tile_id`가 비어 있으면 보드를 바꾸지 않고 `push_error`를 낸다. 정상 흐름에서는 `Placement.check`가 먼저 막는다.
 
 ### 3.2 TileDefs
 
@@ -106,6 +109,7 @@ func rules_for(tile_id: StringName, event: StringName) -> Array[ScoreRule]
 
 - `from_dict`와 `load_file`을 나눈 것은 테스트에서 파일 없이 정의를 만들기 위해서다.
 - 검증에 실패한 정의로는 판을 만들지 않는다(3.7).
+- `from_dict`는 데이터가 틀려도 `null`을 돌려주지 않고, 찾은 문제를 모두 `errors()`에 담는다. `load_file`도 파일이 없거나, JSON이 깨졌거나, 최상위가 객체가 아니면 그 내용을 `errors()`에 담은 빈 정의를 돌려준다. 부르는 쪽은 언제나 `errors()`만 보면 된다.
 
 ### 3.3 Tide
 
@@ -128,6 +132,8 @@ static func effective_cell(cell: BoardState.Cell, phase: Phase) -> BoardState.Ce
 - `effective_cell`은 밀물일 때 갯벌을 바다로 바꿔 돌려주고, 나머지는 그대로 돌려준다. `Placement`와 `Scoring`은 지형을 볼 때 반드시 이 함수를 거친다.
 - `Tide`는 점수를 계산하지 않는다. 물때 점수 계산은 `Scoring.tide_scores`가 하고, 호출은 `GameState`가 한다.
 - `advance_turn`은 배치한 턴에만 부른다. 버리기는 물때를 움직이지 않는다.
+- `advance_turn`은 물때를 바꾼 다음 `phase_changed`를 보낸다. signal을 받는 쪽에서 `get_phase()`는 이미 새 물때다.
+- `_init`은 `GameState.validate_island`를 통과한 값을 받는다(`period_turns`는 1 이상). 다시 검사하지 않는다.
 
 ### 3.4 Placement
 
@@ -153,6 +159,9 @@ static func has_legal_cell(board: BoardState, defs: TileDefs, phase: Tide.Phase,
 4. `WRONG_TERRAIN`: 물때를 반영한 지형이 `terrain`에 없음
 5. `NO_ADJACENT_TERRAIN`: `adjacent_terrain`이 있는데 인접 칸 중 맞는 지형이 없음
 
+- `legal_cells`는 `BoardState.all_cells`의 순서(위에서 아래, 같은 줄에서는 왼쪽에서 오른쪽)로 돌려준다. 봇이 같은 판에서 같은 칸을 고르게 하기 위해서다.
+- `defs`에 없는 `tile_id`는 놓을 수 있는 지형이 없는 타일로 보고 `push_error`로 알린다. `check`는 위 순서대로 4번에서 `WRONG_TERRAIN`을 돌려주고, `legal_cells`는 빈 배열, `has_legal_cell`은 `false`를 돌려준다. 정상 흐름에서는 덱의 id를 `validate_island`가 먼저 검사한다.
+
 ### 3.5 Scoring
 
 점수를 계산한다. 상태가 없고 보드를 바꾸지 않는다.
@@ -169,6 +178,8 @@ static func rule_points(board: BoardState, phase: Tide.Phase, rule: TileDefs.Sco
 - `placement_score`는 타일을 놓기 전의 보드로 계산한다. 화면의 예상 점수와 실제 점수가 같은 함수를 쓴다.
 - `tide_scores`는 바뀐 뒤의 물때를 받아, 그 이벤트의 규칙이 있는 건물마다 점수를 돌려준다. 0점인 건물도 넣는다.
 - `rule_points`는 규칙 하나의 점수다. 규칙 종류별 테스트를 쓰기 쉽게 공개한다.
+- `placement_score`는 배치 가능 여부를 보지 않고 점수만 계산한다. 판정은 `Placement`가 하고, `GameState`는 놓을 수 있는 칸에만 부른다. 그 시점의 규칙이 없는 타일(정의에 없는 id 포함)은 0점이다.
+- `rule_points`는 검증을 통과한 규칙을 받는다. 모르는 `kind`면 `push_error`를 내고 0점을 돌려준다.
 
 ### 3.6 Deck
 
@@ -361,6 +372,14 @@ v1 규칙을 그대로 옮긴 내용이다.
 - `match`에 `tiles`와 `terrain`이 둘 다 있거나 둘 다 없음
 - 정수가 아닌 `points`, `radius`, `max_count`, `max_on_board`, 또는 1보다 작은 `radius`, `max_count`, `max_on_board`
 - 스키마에 없는 필드 이름(오타를 잡기 위해)
+- 필수 필드가 없거나 타입이 틀림(배열 자리에 문자열 등). 최상위의 `tiles`도 필수다
+- 소문자와 밑줄로 된 문자열이 아닌 `id`(숫자도 안 된다)
+- 1이 아닌 `schema_version`(없는 경우 포함)
+- `flat` 규칙에 있는 `match`, `radius`, `max_count`. 이 셋은 `count` 규칙에만 쓴다
+
+`display` 안의 필드는 검사하지 않는다. core가 해석하지 않고 view에 넘기기 때문이다. 다만 `display`가 있으면 객체여야 한다.
+
+오류는 `house.scoring[1].radius: 1 이상의 정수여야 한다 (받은 값: 0)`처럼 타일 id와 필드 경로로 적는다. id를 알 수 없거나 앞의 타일과 겹치면 `tiles[3].id`처럼 순서로 적는다. 첫 오류에서 멈추지 않고 모두 모은다.
 
 ### 5.2 `data/islands/island_01.json`
 
@@ -497,17 +516,20 @@ v1 규칙을 그대로 옮긴 내용이다.
 
 ## 10. 구현할 때 주의할 점
 
-- json에서 읽은 숫자는 float일 수 있다. 정수인지 확인하고 `int`로 바꿔 담는다.
+- json에서 읽은 숫자는 정수도 float로 온다(11장). 정수인지 확인하고 `int`로 바꿔 담는다.
 - json에서 읽은 배열은 타입 없는 `Array`다. `Array[StringName]` 같은 typed array 매개변수에 바로 넘기지 말고 새 배열에 옮겨 담는다.
 - json의 문자열 id는 읽을 때 `StringName`으로 바꾸고, core 안에서는 `StringName`만 쓴다.
 - core에서는 Node, SceneTree, Input, 씬 파일을 쓰지 않는다. 파일 읽기(`FileAccess`)와 `JSON`은 써도 된다.
 - 한 함수가 40줄을 넘으면 나눈다. 데이터 검증은 필드 종류별 작은 함수로 나누면 넘지 않는다.
 
-## 11. 아직 확인하지 못한 것
+## 11. Godot 4.7에서 확인한 것
 
-이 설계는 Godot를 실행할 수 없는 환경에서 작성했다. 아래는 프로젝트 골격을 만들 때 Godot 4.7로 확인한다.
+이 설계는 Godot를 실행할 수 없는 환경에서 작성했다. 프로젝트 골격을 만들 때(2026-11-18) Godot 4.7.stable로 아래를 확인했다. 3장의 선언은 모두 그대로 파싱되어 표기를 바꾼 것이 없다.
 
-- 3장의 선언이 그대로 파싱되는지. 특히 `Array[BoardState.Cell]`처럼 다른 클래스의 enum을 원소로 하는 typed array, `Dictionary[Vector2i, int]` 반환 타입, 다른 클래스의 enum을 타입으로 적은 signal 매개변수.
-- `JSON` 파싱 결과에서 정수가 어떤 타입으로 오는지.
-
-파싱되지 않는 선언이 있으면 뜻을 유지한 채 표기만 바꾸고, 바꾼 내용을 이 문서에 반영한다.
+| 확인한 것 | 결과 |
+| --- | --- |
+| 3장의 선언 전체 | `--check-only`와 `--import`에서 오류 없이 파싱되고, 7개 `class_name`이 모두 등록된다 |
+| 다른 클래스의 enum을 원소로 하는 typed array (`Array[BoardState.Cell]`) | 된다. 실행 중에는 원소 타입이 `int`인 typed array다 |
+| `Dictionary[Vector2i, int]` 반환 타입 | 된다. `return {}`도 키가 `Vector2i`, 값이 `int`인 typed dictionary가 된다 |
+| 다른 클래스의 enum을 타입으로 적은 signal 매개변수 (`new_phase: Tide.Phase`) | 된다. 매개변수 정보에는 타입 `int`, 클래스 이름 `Tide.Phase`로 나온다 |
+| `JSON` 파싱 결과의 정수 | 정수도 모두 `float`로 온다(`1` → `1.0`). 배열은 타입 없는 `Array`로 온다 |

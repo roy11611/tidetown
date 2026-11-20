@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "island_01",
+  "name": "첫 섬",
+  "rows": [
+    "SSSSSSSS",
+    "SSFLLSSS",
+    "SFLLLLFS",
+    "SLLLLLFS",
+    "SLLLLLLS",
+    "SFLLLLFS",
+    "SSFFLLSS",
+    "SSSSSSSS"
+  ],
+  "tide": { "initial": "LOW", "period_turns": 4 },
+  "hand_size": 3,
+  "start_deck": { "house": 5, "pier": 2, "market": 2, "salt_farm": 2, "drying_rack": 1, "lighthouse": 1 },
+  "stages": [
+    { "goal": 10, "bundle": { "house": 2, "pier": 1, "market": 1, "salt_farm": 2 } },
+    { "goal": 24, "bundle": { "house": 2, "pier": 1, "market": 1, "drying_rack": 1, "salt_farm": 1 } },
+    { "goal": 42, "bundle": { "house": 2, "pier": 1, "market": 1, "salt_farm": 2 } },
+    { "goal": 64, "bundle": { "house": 2, "pier": 1, "market": 1, "drying_rack": 1, "salt_farm": 1 } },
+    { "goal": 90, "bundle": { "house": 2, "pier": 1, "market": 1, "salt_farm": 2 } },
+    { "goal": 120, "bundle": { "house": 2, "pier": 1, "market": 1, "drying_rack": 1, "salt_farm": 1 } }
+  ],
+  "after_last_stage": { "goal_step": 30, "bundle": { "house": 2, "pier": 1, "market": 1, "salt_farm": 2 } }
+}

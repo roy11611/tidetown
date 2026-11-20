@@ -8,6 +8,7 @@
 - **게임:** 밀물·썰물로 땅이 바뀌는 한국 바닷가 마을 건설 퍼즐 (cozy puzzle city builder, 타일 배치형)
 - **플랫폼:** 1차 PC(Steam, Windows), 2차 Android 포팅
 - **현재 단계:** 프로토타입 — 목표는 "핵심 루프가 재미있는가" 검증. 그래픽은 색 블록으로 충분하다.
+- **에셋 생성 단계(추후):** 아트 에셋은 Higgsfield(힉스필드)로 생성한다. 프로토타입 단계에서는 만들지 않는다. 시작할 때 Higgsfield의 상업적 이용 조건과 Steam의 AI 생성 콘텐츠 공개 절차를 확인한다.
 - **출시 범위(고정):** 섬 3개, 건물 타일 약 30종, 도전 모드 1종. 범위 밖 기능은 구현하지 말고 `docs/backlog.md`에 적기만 한다.
 - **하지 않는 것:** 전투, 멀티플레이, 긴 스토리, 온라인 기능
 
@@ -101,6 +102,9 @@ docs/
 Godot 실행 파일 이름은 환경마다 다르다. 아래 `godot`은 본인 PC의 Godot 4.7 실행 파일 경로로 바꿔 쓴다.
 
 ```bash
+# class_name 등록. 처음 clone한 뒤, 그리고 class_name을 새로 만들거나 바꾼 뒤 테스트 전에 한 번
+godot --headless --import
+
 # 단위 테스트 전체 실행
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit
 
@@ -110,6 +114,8 @@ godot --headless -s tools/sim/run_sim.gd -- --games=1000 --seed=42
 # 게임 실행
 godot --path .
 ```
+
+테스트 스크립트가 파싱에 실패하면 GUT는 그 파일을 건너뛰고(`Ignoring script ...` 경고), 나머지가 통과하면 exit code 0으로 끝난다. 결과의 `Scripts`와 `Tests` 수가 예상과 같은지 확인한다.
 
 ## 8. Claude 작업 규칙
 
