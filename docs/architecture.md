@@ -178,6 +178,8 @@ static func rule_points(board: BoardState, phase: Tide.Phase, rule: TileDefs.Sco
 - `placement_score`는 타일을 놓기 전의 보드로 계산한다. 화면의 예상 점수와 실제 점수가 같은 함수를 쓴다.
 - `tide_scores`는 바뀐 뒤의 물때를 받아, 그 이벤트의 규칙이 있는 건물마다 점수를 돌려준다. 0점인 건물도 넣는다.
 - `rule_points`는 규칙 하나의 점수다. 규칙 종류별 테스트를 쓰기 쉽게 공개한다.
+- `placement_score`는 배치 가능 여부를 보지 않고 점수만 계산한다. 판정은 `Placement`가 하고, `GameState`는 놓을 수 있는 칸에만 부른다. 그 시점의 규칙이 없는 타일(정의에 없는 id 포함)은 0점이다.
+- `rule_points`는 검증을 통과한 규칙을 받는다. 모르는 `kind`면 `push_error`를 내고 0점을 돌려준다.
 
 ### 3.6 Deck
 
