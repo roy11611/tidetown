@@ -131,6 +131,8 @@ static func effective_cell(cell: BoardState.Cell, phase: Phase) -> BoardState.Ce
 - `effective_cell`은 밀물일 때 갯벌을 바다로 바꿔 돌려주고, 나머지는 그대로 돌려준다. `Placement`와 `Scoring`은 지형을 볼 때 반드시 이 함수를 거친다.
 - `Tide`는 점수를 계산하지 않는다. 물때 점수 계산은 `Scoring.tide_scores`가 하고, 호출은 `GameState`가 한다.
 - `advance_turn`은 배치한 턴에만 부른다. 버리기는 물때를 움직이지 않는다.
+- `advance_turn`은 물때를 바꾼 다음 `phase_changed`를 보낸다. signal을 받는 쪽에서 `get_phase()`는 이미 새 물때다.
+- `_init`은 `GameState.validate_island`를 통과한 값을 받는다(`period_turns`는 1 이상). 다시 검사하지 않는다.
 
 ### 3.4 Placement
 
